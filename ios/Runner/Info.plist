@@ -48,10 +48,12 @@
 	
 	<!-- Camera and Photo Library Permissions -->
 	<key>NSCameraUsageDescription</key>
-	<string>This app needs access to camera to take photos for food recognition.</string>
+	<string>This app needs camera access to capture food images for AI analysis and nutrition information.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app needs access to photo library to select images for food recognition.</string>
+	<string>This app needs photo library access to select food images for analysis.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This app needs access to save photos to your photo library.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app may need microphone access for video recording features.</string>
 </dict>
 </plist>

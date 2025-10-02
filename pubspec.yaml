@@ -35,18 +35,28 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   
-  # Image picking and cropping
+  # Image picking and cropping - Compatible with Android & iOS
   image_picker: ^1.0.8
   image_cropper: ^8.0.2
   
-  # Image processing
+  # Camera (Advanced Kriteria 1) - Compatible with Android & iOS
+  camera: ^0.10.5+9
+  
+  # Image processing - Compatible with Android & iOS
   image: ^4.1.7
   
-  # HTTP requests
+  # HTTP requests & API Integration (Advanced Kriteria 3)
   http: ^1.2.1
+  google_generative_ai: ^0.3.1
   
   # Environment variables
   flutter_dotenv: ^5.1.0
+  
+  # Path provider for file storage - Compatible with Android & iOS
+  path_provider: ^2.1.2
+  
+  # Permission handler for camera and storage - Compatible with Android & iOS
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:
@@ -72,8 +82,10 @@ flutter:
 
   # Assets for TensorFlow Lite model and labels
   assets:
+    - assets/
     - assets/models/
     - assets/models/food_labels.txt
+    - assets/.env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
