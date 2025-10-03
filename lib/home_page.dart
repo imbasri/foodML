@@ -46,7 +46,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       _isLoading = true;
     });
 
-    // Initialize camera service
     final success = await CameraService.initialize();
     setState(() {
       _cameraInitialized = success;
@@ -229,10 +228,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         child: SafeArea(
           child: Column(
             children: [
-              // Enhanced App Bar
               _buildAppBar(),
               
-              // Main Content
               Expanded(
                 child: _buildBody(),
               ),
@@ -601,7 +598,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(28),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25), // Slightly smaller to account for border
+                        borderRadius: BorderRadius.circular(25),
                         child: CameraService.getPreviewWidget(),
                       ),
                     ),
@@ -611,7 +608,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   if (!_isLoading && _showGrid)
                     Positioned.fill(
                       child: Container(
-                        margin: const EdgeInsets.all(3), // Account for border
+                        margin: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
                         ),
@@ -876,7 +873,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                           try {
                                             await CameraService.setZoomLevel(value);
                                           } catch (e) {
-                                            // Handle zoom error silently
+                                            // Zoom error handled silently
                                           }
                                         },
                                       ),

@@ -6,21 +6,15 @@ import 'services/gemini_nutrition_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize services in background
   _initializeServices();
-  
   runApp(const MyApp());
 }
 
-/// Initialize all AI services in background
 void _initializeServices() async {
   try {
-    // Initialize TensorFlow Lite service
     final tfInitialized = await TensorFlowLiteService.initialize();
     debugPrint('TensorFlow Lite initialized: $tfInitialized');
     
-    // Initialize Gemini service
     final geminiInitialized = await GeminiNutritionService.initialize();
     debugPrint('Gemini service initialized: $geminiInitialized');
   } catch (e) {

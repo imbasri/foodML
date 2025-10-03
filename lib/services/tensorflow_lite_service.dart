@@ -3,29 +3,32 @@ import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-// import 'package:tflite_flutter/tflite_flutter.dart';
 
 class TensorFlowLiteService {
-  // static Interpreter? _interpreter;
   static List<String>? _labels;
   static bool _isInitialized = false;
   static String? _geminiApiKey;
 
-  // Food101 model input shape: [1, 224, 224, 3]
   static const int inputSize = 224;
   static const int numChannels = 3;
   static const double mean = 127.5;
   static const double std = 127.5;
 
-  /// Initialize TensorFlow Lite model and labels
+  /// Format food name by replacing underscores with spaces and capitalizing
+  static String _formatFoodName(String rawName) {
+    return rawName
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((word) => word.isNotEmpty ? word[0].toUpperCase() + word.substring(1).toLowerCase() : '')
+        .join(' ');
+  }
+
   static Future<bool> initialize() async {
     try {
       debugPrint('Initializing TensorFlow Lite service...');
 
-      // Load Gemini API key for enhanced recognition
       _geminiApiKey = await _loadGeminiApiKey();
       
-      // Load labels
       _labels = await _loadLabelsFromAssets();
       if (_labels == null || _labels!.isEmpty) {
         debugPrint('Failed to load labels');
@@ -44,7 +47,6 @@ class TensorFlowLiteService {
     }
   }
 
-  /// Load Gemini API key for enhanced recognition
   static Future<String?> _loadGeminiApiKey() async {
     try {
       final String envContent = await rootBundle.loadString('assets/.env');
@@ -175,13 +177,13 @@ Confidence should be between 0.7-0.98 based on image clarity."""
             debugPrint('✅ Gemini AI food recognition successful: ${aiResult['food_name']}');
             
             return {
-              'food_name': aiResult['food_name'] ?? 'unknown_food',
+              'food_name': _formatFoodName(aiResult['food_name'] ?? 'unknown_food'),
               'confidence': (aiResult['confidence'] ?? 0.85).toDouble(),
               'description': aiResult['description'] ?? 'AI identified food',
               'category': aiResult['category'] ?? 'food',
               'predictions': [
                 {
-                  'label': aiResult['food_name'] ?? 'unknown_food',
+                  'label': _formatFoodName(aiResult['food_name'] ?? 'unknown_food'),
                   'confidence': (aiResult['confidence'] ?? 0.85).toDouble(),
                 }
               ],

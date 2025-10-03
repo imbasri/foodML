@@ -6,7 +6,6 @@ class CameraService {
   static List<CameraDescription>? _cameras;
   static bool _isInitialized = false;
 
-  /// Initialize camera service
   static Future<bool> initialize() async {
     try {
       _cameras = await availableCameras();
@@ -32,13 +31,10 @@ class CameraService {
     }
   }
 
-  /// Get camera controller instance
   static CameraController? get controller => _controller;
 
-  /// Check if camera is initialized
   static bool get isInitialized => _isInitialized && _controller != null;
 
-  /// Capture image from camera stream
   static Future<String?> captureImage() async {
     if (!isInitialized) {
       debugPrint('Camera not initialized');
@@ -55,7 +51,6 @@ class CameraService {
     }
   }
 
-  /// Switch camera (front/back)
   static Future<bool> switchCamera() async {
     if (_cameras == null || _cameras!.length < 2) {
       return false;
@@ -86,7 +81,6 @@ class CameraService {
     }
   }
 
-  /// Toggle flash mode
   static Future<void> toggleFlash() async {
     if (!isInitialized) return;
 

@@ -74,38 +74,79 @@ class GeminiNutritionService {
 
     try {
       final prompt = '''
-      Provide detailed nutritional information for: $foodName
+      Provide comprehensive nutrition and recipe information for: ${foodName.replaceAll('_', ' ')}
 
       Please return the information in this exact JSON format (no additional text):
       {
-        "name": "$foodName",
+        "name": "${foodName.replaceAll('_', ' ')}",
         "calories": <number>,
-        "servingSize": "<serving size>",
+        "protein": <number>,
+        "carbohydrates": <number>,
+        "fat": <number>,
+        "fiber": <number>,
+        "sugar": <number>,
+        "sodium": <number>,
+        "servingSize": "<typical serving size>",
         "nutrients": {
-          "protein": "<amount>g",
-          "carbohydrates": "<amount>g",
-          "fat": "<amount>g",
-          "fiber": "<amount>g",
-          "sugar": "<amount>g",
-          "sodium": "<amount>mg",
-          "cholesterol": "<amount>mg",
+          "vitaminA": "<amount>mcg",
           "vitaminC": "<amount>mg",
+          "vitaminD": "<amount>mcg",
+          "vitaminE": "<amount>mg",
+          "vitaminK": "<amount>mcg",
+          "thiamine": "<amount>mg",
+          "riboflavin": "<amount>mg",
+          "niacin": "<amount>mg",
+          "folate": "<amount>mcg",
           "calcium": "<amount>mg",
-          "iron": "<amount>mg"
+          "iron": "<amount>mg",
+          "magnesium": "<amount>mg",
+          "phosphorus": "<amount>mg",
+          "potassium": "<amount>mg",
+          "zinc": "<amount>mg",
+          "selenium": "<amount>mcg"
         },
-        "healthBenefits": [
-          "<benefit 1>",
-          "<benefit 2>",
-          "<benefit 3>"
+        "dietaryInfo": {
+          "isVegetarian": <true/false>,
+          "isVegan": <true/false>,
+          "isGlutenFree": <true/false>,
+          "isDairyFree": <true/false>,
+          "allergens": ["<allergen1>", "<allergen2>"],
+          "dietaryFiber": "<high/medium/low>",
+          "glycemicIndex": "<high/medium/low>"
+        },
+        "benefits": [
+          "<detailed health benefit 1>",
+          "<detailed health benefit 2>",
+          "<detailed health benefit 3>",
+          "<detailed health benefit 4>"
         ],
-        "cookingTips": [
-          "<tip 1>",
-          "<tip 2>"
+        "preparationTips": [
+          "<cooking/preparation tip 1>",
+          "<cooking/preparation tip 2>",
+          "<cooking/preparation tip 3>"
         ],
+        "recipe": {
+          "ingredients": [
+            "<ingredient 1 with amount>",
+            "<ingredient 2 with amount>",
+            "<ingredient 3 with amount>",
+            "<ingredient 4 with amount>"
+          ],
+          "instructions": [
+            "<step 1>",
+            "<step 2>",
+            "<step 3>",
+            "<step 4>"
+          ],
+          "prepTime": "<time in minutes>",
+          "cookTime": "<time in minutes>",
+          "difficulty": "<Easy/Medium/Hard>",
+          "servings": <number>
+        },
         "source": "Gemini AI"
       }
 
-      Provide realistic, accurate nutritional values for a typical serving.
+      Provide realistic, accurate nutritional values per 100g serving. Include complete micronutrient profile, dietary classifications, and a simple but delicious recipe.
       ''';
 
       final content = [Content.text(prompt)];
@@ -188,56 +229,193 @@ class GeminiNutritionService {
       'pizza': {
         'name': 'Pizza',
         'calories': 285,
+        'protein': 12,
+        'carbohydrates': 36,
+        'fat': 10,
+        'fiber': 2,
+        'sugar': 4,
+        'sodium': 640,
         'servingSize': '1 slice (100g)',
         'nutrients': {
-          'protein': '12g',
-          'carbohydrates': '36g',
-          'fat': '10g',
-          'fiber': '2.3g',
-          'sugar': '3.6g',
-          'sodium': '640mg',
-          'cholesterol': '17mg',
+          'vitaminA': '15mcg',
           'vitaminC': '2mg',
+          'vitaminD': '0.1mcg',
           'calcium': '200mg',
-          'iron': '2.5mg'
+          'iron': '2.5mg',
+          'magnesium': '25mg',
+          'potassium': '230mg',
+          'zinc': '1.2mg',
         },
-        'healthBenefits': [
-          'Good source of calcium and protein',
-          'Provides energy from carbohydrates',
-          'Contains lycopene from tomato sauce'
+        'dietaryInfo': {
+          'isVegetarian': true,
+          'isVegan': false,
+          'isGlutenFree': false,
+          'isDairyFree': false,
+          'allergens': ['gluten', 'dairy'],
+          'glycemicIndex': 'medium'
+        },
+        'benefits': [
+          'Good source of calcium for strong bones and teeth',
+          'Provides energy from carbohydrates for daily activities',
+          'Contains lycopene from tomato sauce which has antioxidant properties',
+          'Protein content supports muscle maintenance and growth'
         ],
-        'cookingTips': [
-          'Use whole wheat crust for more fiber',
-          'Add vegetables for extra nutrients'
+        'preparationTips': [
+          'Use whole wheat crust for more fiber and nutrients',
+          'Add vegetables like bell peppers and spinach for extra vitamins',
+          'Choose lean proteins like grilled chicken or turkey'
         ],
-        'source': 'Nutrition Database (Fallback)'
+        'recipe': {
+          'ingredients': [
+            '200g pizza dough',
+            '100ml tomato sauce',
+            '150g mozzarella cheese',
+            '2 tbsp olive oil',
+            'Fresh basil leaves',
+            'Salt and pepper to taste'
+          ],
+          'instructions': [
+            'Preheat oven to 220°C (200°C fan)',
+            'Roll out pizza dough on a floured surface',
+            'Spread tomato sauce evenly over the base',
+            'Add mozzarella cheese and desired toppings',
+            'Bake for 12-15 minutes until golden and crispy',
+            'Garnish with fresh basil before serving'
+          ],
+          'prepTime': '15 min',
+          'cookTime': '15 min',
+          'difficulty': 'Easy',
+          'servings': 4
+        },
+        'source': 'Enhanced Nutrition Database (Fallback)'
       },
       'hamburger': {
         'name': 'Hamburger',
         'calories': 540,
+        'protein': 25,
+        'carbohydrates': 40,
+        'fat': 31,
+        'fiber': 2,
+        'sugar': 5,
+        'sodium': 1040,
         'servingSize': '1 burger (150g)',
         'nutrients': {
-          'protein': '25g',
-          'carbohydrates': '40g',
-          'fat': '31g',
-          'fiber': '2g',
-          'sugar': '5g',
-          'sodium': '1040mg',
-          'cholesterol': '80mg',
+          'vitaminA': '8mcg',
           'vitaminC': '1mg',
+          'vitaminD': '0.5mcg',
           'calcium': '120mg',
-          'iron': '4mg'
+          'iron': '4mg',
+          'magnesium': '35mg',
+          'potassium': '380mg',
+          'zinc': '5mg',
         },
-        'healthBenefits': [
-          'High protein content for muscle building',
-          'Iron for healthy blood',
-          'B-vitamins for energy metabolism'
+        'dietaryInfo': {
+          'isVegetarian': false,
+          'isVegan': false,
+          'isGlutenFree': false,
+          'isDairyFree': false,
+          'allergens': ['gluten', 'dairy'],
+          'glycemicIndex': 'medium'
+        },
+        'benefits': [
+          'High protein content supports muscle building and repair',
+          'Good source of iron for healthy blood and oxygen transport',
+          'Provides B-vitamins essential for energy metabolism',
+          'Contains zinc which supports immune system function'
         ],
-        'cookingTips': [
-          'Choose lean ground beef',
-          'Add lettuce and tomato for vitamins'
+        'preparationTips': [
+          'Choose lean ground beef (90% lean) to reduce fat content',
+          'Add lettuce, tomato, and onions for extra vitamins and fiber',
+          'Use whole grain buns for additional nutrients and fiber'
         ],
-        'source': 'Nutrition Database (Fallback)'
+        'recipe': {
+          'ingredients': [
+            '150g lean ground beef',
+            '1 hamburger bun',
+            '1 slice cheese',
+            '2 lettuce leaves',
+            '2 tomato slices',
+            '1 tbsp mayonnaise',
+            'Salt and pepper to taste'
+          ],
+          'instructions': [
+            'Season ground beef with salt and pepper',
+            'Form into a patty slightly larger than the bun',
+            'Cook in a hot pan for 3-4 minutes per side',
+            'Add cheese in the last minute of cooking',
+            'Toast the bun lightly',
+            'Assemble with lettuce, tomato, and condiments'
+          ],
+          'prepTime': '10 min',
+          'cookTime': '8 min',
+          'difficulty': 'Easy',
+          'servings': 1
+        },
+        'source': 'Enhanced Nutrition Database (Fallback)'
+      },
+      'chicken curry': {
+        'name': 'Chicken Curry',
+        'calories': 165,
+        'protein': 22,
+        'carbohydrates': 8,
+        'fat': 6,
+        'fiber': 2,
+        'sugar': 4,
+        'sodium': 420,
+        'servingSize': '1 cup (250ml)',
+        'nutrients': {
+          'vitaminA': '95mcg',
+          'vitaminC': '12mg',
+          'vitaminD': '0.3mcg',
+          'calcium': '45mg',
+          'iron': '1.8mg',
+          'magnesium': '28mg',
+          'potassium': '340mg',
+          'zinc': '1.5mg',
+        },
+        'dietaryInfo': {
+          'isVegetarian': false,
+          'isVegan': false,
+          'isGlutenFree': true,
+          'isDairyFree': true,
+          'allergens': [],
+          'glycemicIndex': 'low'
+        },
+        'benefits': [
+          'High-quality protein supports muscle development and repair',
+          'Turmeric and spices provide anti-inflammatory compounds',
+          'Low in carbohydrates, suitable for weight management',
+          'Rich in vitamins and minerals from vegetables and spices'
+        ],
+        'preparationTips': [
+          'Use coconut milk for creaminess without dairy',
+          'Add vegetables like bell peppers and spinach for extra nutrition',
+          'Serve with brown rice or quinoa for complete nutrition'
+        ],
+        'recipe': {
+          'ingredients': [
+            '300g chicken breast, cubed',
+            '1 onion, diced',
+            '2 cloves garlic, minced',
+            '1 tbsp curry powder',
+            '200ml coconut milk',
+            '1 can diced tomatoes',
+            '2 tbsp vegetable oil'
+          ],
+          'instructions': [
+            'Heat oil in a large pan over medium heat',
+            'Cook onion and garlic until fragrant',
+            'Add chicken and cook until browned',
+            'Stir in curry powder and cook for 1 minute',
+            'Add tomatoes and coconut milk, simmer 15 minutes',
+            'Season with salt and pepper to taste'
+          ],
+          'prepTime': '15 min',
+          'cookTime': '25 min',
+          'difficulty': 'Medium',
+          'servings': 4
+        },
+        'source': 'Enhanced Nutrition Database (Fallback)'
       }
     };
 
@@ -246,28 +424,61 @@ class GeminiNutritionService {
     return nutritionDatabase[normalizedName] ?? {
       'name': foodName,
       'calories': 200,
+      'protein': 8,
+      'carbohydrates': 30,
+      'fat': 5,
+      'fiber': 3,
+      'sugar': 5,
+      'sodium': 400,
       'servingSize': '1 serving (100g)',
       'nutrients': {
-        'protein': '8g',
-        'carbohydrates': '30g',
-        'fat': '5g',
-        'fiber': '3g',
-        'sugar': '5g',
-        'sodium': '400mg',
-        'cholesterol': '10mg',
+        'vitaminA': '10mcg',
         'vitaminC': '5mg',
+        'vitaminD': '0.2mcg',
         'calcium': '100mg',
-        'iron': '2mg'
+        'iron': '2mg',
+        'magnesium': '20mg',
+        'potassium': '250mg',
+        'zinc': '1mg',
       },
-      'healthBenefits': [
-        'Provides essential nutrients',
-        'Source of energy',
-        'Supports healthy diet'
+      'dietaryInfo': {
+        'isVegetarian': false,
+        'isVegan': false,
+        'isGlutenFree': false,
+        'isDairyFree': false,
+        'allergens': [],
+        'glycemicIndex': 'medium'
+      },
+      'benefits': [
+        'Provides essential nutrients for daily energy needs',
+        'Source of protein for muscle maintenance',
+        'Contains vitamins and minerals for overall health',
+        'Supports a balanced and nutritious diet'
       ],
-      'cookingTips': [
-        'Cook thoroughly',
-        'Pair with vegetables'
+      'preparationTips': [
+        'Cook thoroughly to ensure food safety',
+        'Pair with vegetables for additional nutrients',
+        'Use healthy cooking methods like grilling or steaming'
       ],
+      'recipe': {
+        'ingredients': [
+          'Main ingredient as needed',
+          'Salt and pepper to taste',
+          'Cooking oil (1-2 tbsp)',
+          'Optional seasonings'
+        ],
+        'instructions': [
+          'Prepare ingredients by washing and cutting as needed',
+          'Heat cooking oil in a pan over medium heat',
+          'Cook the main ingredient thoroughly',
+          'Season with salt, pepper, and desired spices',
+          'Serve hot with your favorite sides'
+        ],
+        'prepTime': '10 min',
+        'cookTime': '15 min',
+        'difficulty': 'Easy',
+        'servings': 2
+      },
       'source': 'Generic Nutrition (Fallback)'
     };
   }
