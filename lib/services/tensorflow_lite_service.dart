@@ -36,29 +36,29 @@ class TensorFlowLiteService {
   // Inisialisasi service
   static Future<bool> initialize() async {
     try {
-      print('Memulai inisialisasi TensorFlow Lite...');
+      // print('Memulai inisialisasi TensorFlow Lite...');
 
       // Load API key terlebih dahulu
       _geminiApiKey = await _loadGeminiApiKey();
       if (_geminiApiKey == null) {
-        print('API key Gemini tidak ditemukan, menggunakan metode dasar');
+        // print('API key Gemini tidak ditemukan, menggunakan metode dasar');
       }
       
       // Load label makanan dari assets
       _labels = await _loadLabelsFromAssets();
       if (_labels == null || _labels!.isEmpty) {
-        print('Error: Tidak dapat memuat label makanan');
+        // print('Error: Tidak dapat memuat label makanan');
         return false;
       }
 
       _isInitialized = true;
-      print('Service berhasil diinisialisasi');
-      print('Berhasil memuat ${_labels!.length} kategori makanan');
-      print('AI Enhancement: ${_geminiApiKey != null ? "Aktif" : "Nonaktif"}');
+      // print('Service berhasil diinisialisasi');
+      // print('Berhasil memuat ${_labels!.length} kategori makanan');
+      // print('AI Enhancement: ${_geminiApiKey != null ? "Aktif" : "Nonaktif"}');
       
       return true;
     } catch (error) {
-      print('Inisialisasi gagal: $error');
+      // print('Inisialisasi gagal: $error');
       return false;
     }
   }
@@ -87,11 +87,11 @@ class TensorFlowLiteService {
       
       final apiKey = envVariables['GEMINI_API_KEY'];
       if (apiKey?.isNotEmpty == true) {
-        print('API key berhasil dimuat');
+        // print('API key berhasil dimuat');
       }
       return apiKey;
     } catch (error) {
-      print('Tidak dapat memuat API key: $error');
+      // print('Tidak dapat memuat API key: $error');
       return null;
     }
   }
@@ -102,10 +102,10 @@ class TensorFlowLiteService {
       final labelsFileContent = await rootBundle.loadString('assets/models/food_labels.txt');
       final foodCategories = labelsFileContent.trim().split('\n');
       
-      print('Berhasil memuat ${foodCategories.length} kategori makanan dari assets');
+      // print('Berhasil memuat ${foodCategories.length} kategori makanan dari assets');
       return foodCategories;
     } catch (error) {
-      print('Gagal memuat label makanan: $error');
+      // print('Gagal memuat label makanan: $error');
       return null;
     }
   }
@@ -114,30 +114,30 @@ class TensorFlowLiteService {
   static Future<Map<String, dynamic>> predictFood(String imagePath) async {
     // Pastikan service sudah diinisialisasi
     if (!_isInitialized) {
-      print('Service belum siap, menggunakan prediksi dasar');
+      // print('Service belum siap, menggunakan prediksi dasar');
       return _getFallbackPrediction(imagePath);
     }
 
     try {
       // Strategi 1: Coba Gemini AI dulu jika tersedia
       if (_geminiApiKey != null && _geminiApiKey!.isNotEmpty) {
-        print('Mencoba pengenalan dengan AI...');
+        // print('Mencoba pengenalan dengan AI...');
         final aiPrediction = await _predictWithGeminiAI(imagePath);
         if (aiPrediction != null) {
-          print('Pengenalan AI berhasil');
+          // print('Pengenalan AI berhasil');
           return aiPrediction;
         } else {
-          print('AI gagal, mencoba metode alternatif');
+          // print('AI gagal, mencoba metode alternatif');
         }
       }
 
       // Strategi 2: Gunakan model TensorFlow Lite lokal
-      print('Menggunakan model ML lokal');
-      print('Menggunakan prediksi fallback pintar');
+      // print('Menggunakan model ML lokal');
+      // print('Menggunakan prediksi fallback pintar');
       return _getFallbackPrediction(imagePath);
       
     } catch (error) {
-      print('Error dalam prediksi: $error');
+      // print('Error dalam prediksi: $error');
       return _getFallbackPrediction(imagePath);
     }
   }
@@ -145,18 +145,18 @@ class TensorFlowLiteService {
   // Integrasi Gemini AI untuk analisis gambar makanan
   static Future<Map<String, dynamic>?> _predictWithGeminiAI(String imagePath) async {
     try {
-      print('Memproses gambar dengan Gemini AI...');
+      // print('Memproses gambar dengan Gemini AI...');
       
       // Baca file gambar dan konversi ke base64
       final imageFile = File(imagePath);
       if (!await imageFile.exists()) {
-        print('File gambar tidak ditemukan: $imagePath');
+        // print('File gambar tidak ditemukan: $imagePath');
         return null;
       }
       
       final imageBytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(imageBytes);
-      print('Gambar berhasil dienkode, ukuran: ${(imageBytes.length / 1024).toStringAsFixed(1)}KB');
+      // print('Gambar berhasil dienkode, ukuran: ${(imageBytes.length / 1024).toStringAsFixed(1)}KB');
 
       // Setup endpoint API menggunakan model Gemini terbaru
       const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -201,7 +201,7 @@ Catatan penting:
       };
 
       // Kirim request ke API
-      print('Mengirim request ke Gemini API...');
+      // print('Mengirim request ke Gemini API...');
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {
@@ -213,14 +213,14 @@ Catatan penting:
 
       // Periksa apakah API call berhasil
       if (response.statusCode == 200) {
-        print('Mendapat respons dari Gemini');
+        // print('Mendapat respons dari Gemini');
         final responseData = json.decode(response.body);
         
         // Navigasi melalui struktur respons
         final content = responseData['candidates']?[0]?['content']?['parts']?[0]?['text'];
         
         if (content != null) {
-          print('Memproses respons AI...');
+          // print('Memproses respons AI...');
           // Coba ekstrak JSON dari respons
           final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(content);
           if (jsonMatch != null) {
@@ -256,7 +256,7 @@ Catatan penting:
 
   // Fallback darurat ketika semua metode lain gagal
   static Map<String, dynamic> _getFallbackPrediction(String imagePath) {
-    print('Menggunakan prediksi fallback darurat...');
+    // print('Menggunakan prediksi fallback darurat...');
     
     // Daftar makanan umum yang sering difoto
     final commonFoods = [
@@ -277,7 +277,7 @@ Catatan penting:
     final selectedIndex = pathHash % commonFoods.length;
     final chosenFood = commonFoods[selectedIndex];
     
-    print('Fallback terpilih: ${chosenFood['name']} (${chosenFood['reason']})');
+    // print('Fallback terpilih: ${chosenFood['name']} (${chosenFood['reason']})');
 
     return {
       'food_name': _formatFoodName(chosenFood['name'] as String),

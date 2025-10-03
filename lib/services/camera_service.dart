@@ -10,7 +10,7 @@ class CameraService {
     try {
       _cameras = await availableCameras();
       if (_cameras == null || _cameras!.isEmpty) {
-        debugPrint('No cameras available');
+        debugPrint('Tidak ada kamera yang tersedia');
         return false;
       }
       
@@ -23,10 +23,10 @@ class CameraService {
 
       await _controller!.initialize();
       _isInitialized = true;
-      debugPrint('Camera service initialized successfully');
+      debugPrint('Service kamera berhasil diinisialisasi');
       return true;
     } catch (e) {
-      debugPrint('Error initializing camera: $e');
+      debugPrint('Error saat inisialisasi kamera: $e');
       return false;
     }
   }
@@ -37,16 +37,16 @@ class CameraService {
 
   static Future<String?> captureImage() async {
     if (!isInitialized) {
-      debugPrint('Camera not initialized');
+      debugPrint('Kamera belum diinisialisasi');
       return null;
     }
 
     try {
       final XFile image = await _controller!.takePicture();
-      debugPrint('Image captured: ${image.path}');
+      debugPrint('Gambar berhasil diambil: ${image.path}');
       return image.path;
     } catch (e) {
-      debugPrint('Error capturing image: $e');
+      debugPrint('Error saat mengambil gambar: $e');
       return null;
     }
   }
@@ -76,7 +76,7 @@ class CameraService {
       await _controller!.initialize();
       return true;
     } catch (e) {
-      debugPrint('Error switching camera: $e');
+      debugPrint('Error saat mengganti kamera: $e');
       return false;
     }
   }
@@ -92,7 +92,7 @@ class CameraService {
       
       await _controller!.setFlashMode(newFlashMode);
     } catch (e) {
-      debugPrint('Error toggling flash: $e');
+      debugPrint('Error saat mengubah flash: $e');
     }
   }
 
@@ -109,7 +109,7 @@ class CameraService {
       final double clampedZoom = zoomLevel.clamp(1.0, 8.0);
       await _controller!.setZoomLevel(clampedZoom);
     } catch (e) {
-      debugPrint('Error setting zoom level: $e');
+      debugPrint('Error saat mengatur zoom level: $e');
     }
   }
 
@@ -120,7 +120,7 @@ class CameraService {
     try {
       return await _controller!.getMaxZoomLevel();
     } catch (e) {
-      debugPrint('Error getting max zoom level: $e');
+      debugPrint('Error saat mendapatkan max zoom level: $e');
       return 5.0;
     }
   }

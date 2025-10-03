@@ -13,12 +13,12 @@ void main() async {
 void _initializeServices() async {
   try {
     final tfInitialized = await TensorFlowLiteService.initialize();
-    debugPrint('TensorFlow Lite initialized: $tfInitialized');
+    debugPrint('TensorFlow Lite diinisialisasi: $tfInitialized');
     
     final geminiInitialized = await GeminiNutritionService.initialize();
-    debugPrint('Gemini service initialized: $geminiInitialized');
+    debugPrint('Service Gemini diinisialisasi: $geminiInitialized');
   } catch (e) {
-    debugPrint('Error initializing services: $e');
+    debugPrint('Error saat inisialisasi services: $e');
   }
 }
 

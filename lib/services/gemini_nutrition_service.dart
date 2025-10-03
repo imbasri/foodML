@@ -11,12 +11,12 @@ class GeminiNutritionService {
   /// Initialize Gemini API service
   static Future<bool> initialize() async {
     try {
-      debugPrint('Initializing Gemini Nutrition Service...');
+      debugPrint('Menginisialisasi Gemini Nutrition Service...');
 
       // Load API key from environment or assets
       _apiKey = await _loadApiKey();
       if (_apiKey == null || _apiKey!.isEmpty) {
-        debugPrint('Gemini API key not found');
+        debugPrint('API key Gemini tidak ditemukan');
         return false;
       }
 
@@ -32,10 +32,10 @@ class GeminiNutritionService {
       );
 
       _isInitialized = true;
-      debugPrint('Gemini Nutrition Service initialized successfully');
+      debugPrint('Gemini Nutrition Service berhasil diinisialisasi');
       return true;
     } catch (e) {
-      debugPrint('Error initializing Gemini service: $e');
+      debugPrint('Error saat inisialisasi service Gemini: $e');
       return false;
     }
   }
@@ -59,7 +59,7 @@ class GeminiNutritionService {
       
       return envMap['GEMINI_API_KEY'];
     } catch (e) {
-      debugPrint('Error loading API key: $e');
+      debugPrint('Error saat memuat API key: $e');
       // In production, you might want to load from secure storage
       return null;
     }
@@ -68,7 +68,7 @@ class GeminiNutritionService {
   /// Get detailed nutrition information for food
   static Future<Map<String, dynamic>> getNutritionInfo(String foodName) async {
     if (!_isInitialized || _model == null) {
-      debugPrint('Gemini service not initialized, using fallback');
+      debugPrint('Service Gemini belum diinisialisasi, menggunakan fallback');
       return _getFallbackNutrition(foodName);
     }
 
@@ -157,14 +157,14 @@ class GeminiNutritionService {
         final jsonStr = response.text!.trim();
         final Map<String, dynamic> nutritionData = json.decode(jsonStr);
         
-        debugPrint('Gemini nutrition info retrieved successfully');
+        debugPrint('Info nutrisi Gemini berhasil didapatkan');
         return nutritionData;
       } else {
-        debugPrint('Empty response from Gemini');
+        debugPrint('Respons kosong dari Gemini');
         return _getFallbackNutrition(foodName);
       }
     } catch (e) {
-      debugPrint('Error getting nutrition info from Gemini: $e');
+      debugPrint('Error saat mendapatkan info nutrisi dari Gemini: $e');
       return _getFallbackNutrition(foodName);
     }
   }
@@ -172,7 +172,7 @@ class GeminiNutritionService {
   /// Get food recipe suggestions from Gemini
   static Future<Map<String, dynamic>?> getRecipeSuggestion(String foodName) async {
     if (!_isInitialized || _model == null) {
-      debugPrint('Gemini service not initialized');
+      debugPrint('Service Gemini belum diinisialisasi');
       return null;
     }
 
@@ -212,11 +212,11 @@ class GeminiNutritionService {
       if (response.text != null) {
         final jsonStr = response.text!.trim();
         final Map<String, dynamic> recipeData = json.decode(jsonStr);
-        debugPrint('Gemini recipe retrieved successfully');
+        debugPrint('Resep Gemini berhasil didapatkan');
         return recipeData;
       }
     } catch (e) {
-      debugPrint('Error getting recipe from Gemini: $e');
+      debugPrint('Error saat mendapatkan resep dari Gemini: $e');
     }
     
     return null;

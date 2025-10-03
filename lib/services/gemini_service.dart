@@ -161,7 +161,7 @@ class GeminiService {
       // Handle HTTP errors
       if (response.statusCode != 200) {
         final errorBody = response.body;
-        debugPrint('Gemini API Error (${response.statusCode}): $errorBody');
+        debugPrint('Error Gemini API (${response.statusCode}): $errorBody');
         
         if (response.statusCode == 401) {
           throw Exception('Invalid API key. Please check your Gemini API key.');
@@ -203,7 +203,7 @@ class GeminiService {
       
       return nutritionData;
     } catch (e) {
-      debugPrint('Error in getNutritionEstimates: $e');
+      debugPrint('Error pada getNutritionEstimates: $e');
       rethrow;
     }
   }
