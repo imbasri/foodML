@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'services/tensorflow_lite_service.dart';
-import 'services/gemini_nutrition_service.dart';
+import 'services/tensorflow_lite_service_safe.dart';
+import 'services/local_nutrition_service.dart';
+import 'services/food_analysis_isolate_service.dart';
 
 class PredictionPage extends StatefulWidget {
   final String imagePath;
@@ -22,11 +24,62 @@ class _PredictionPageState extends State<PredictionPage> {
   String? _errorMessage;
   String? _topPrediction;
   double? _score;
+  String _loadingStatus = 'Memulai analisis...';
+  final bool _useIsolate = true; // Flag untuk menggunakan Isolate atau tidak
 
   @override
   void initState() {
     super.initState();
-    _performMLPrediction();
+    _initializeAndPredict();
+  }
+
+  /// Pastikan semua service sudah diinisialisasi sebelum prediksi
+  Future<void> _initializeAndPredict() async {
+    setState(() {
+      _isLoadingPrediction = true;
+      _loadingStatus = 'Memeriksa inisialisasi service...';
+    });
+
+    try {
+      // Check dan tunggu TensorFlow Lite service
+      if (!TensorFlowLiteService.isInitialized) {
+        setState(() {
+          _loadingStatus = 'Menginisialisasi TensorFlow Lite...';
+        });
+        final tfInitialized = await TensorFlowLiteService.initialize();
+        if (!tfInitialized) {
+          throw Exception('Gagal menginisialisasi TensorFlow Lite');
+        }
+      }
+
+      // Check dan tunggu Local Nutrition service  
+      if (!LocalNutritionService.isInitialized) {
+        setState(() {
+          _loadingStatus = 'Menginisialisasi Database Nutrisi...';
+        });
+        await LocalNutritionService.initialize();
+        if (!LocalNutritionService.isInitialized) {
+          throw Exception('Gagal menginisialisasi Database Nutrisi');
+        }
+      }
+
+      // Check Isolate service untuk mobile
+      if (!kIsWeb && !FoodAnalysisIsolateService.isInitialized) {
+        setState(() {
+          _loadingStatus = 'Menginisialisasi Background Processing...';
+        });
+        await FoodAnalysisIsolateService.initialize();
+      }
+
+      // Semua service siap, mulai prediksi
+      await _performMLPrediction();
+      
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error inisialisasi: $e';
+        _isLoadingPrediction = false;
+      });
+    }
   }
 
   @override
@@ -96,7 +149,7 @@ class _PredictionPageState extends State<PredictionPage> {
               children: [
                 const SizedBox(height: 20),
                 
-                // Enhanced Image Display
+                // Tampilan gambar yang dipilih
                 Container(
                   height: 280,
                   width: double.infinity,
@@ -174,7 +227,7 @@ class _PredictionPageState extends State<PredictionPage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Enhanced Prediction Results Card
+                // Kartu hasil prediksi AI
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.95),
@@ -254,12 +307,28 @@ class _PredictionPageState extends State<PredictionPage> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'AI is identifying the food and nutrients',
+                                    _loadingStatus,
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade600,
                                     ),
                                     textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue.shade50,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      kIsWeb ? 'Main Thread Processing (Web)' : 'Background Processing dengan Isolate',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.blue.shade600,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -420,7 +489,7 @@ class _PredictionPageState extends State<PredictionPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Enhanced Get Recipe Button
+                // Tombol untuk mendapatkan resep dan nutrisi
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -467,7 +536,7 @@ class _PredictionPageState extends State<PredictionPage> {
                 ),
                 const SizedBox(height: 24),
 
-                // Enhanced Nutrition/Recipe Results
+                // Hasil informasi nutrisi dan resep
                 if (_mealData != null) ...[
                   _buildEnhancedMealCard(_mealData!),
                 ],
@@ -480,23 +549,18 @@ class _PredictionPageState extends State<PredictionPage> {
   }
 
   Future<void> _performMLPrediction() async {
+    // State sudah di-set di _initializeAndPredict, tidak perlu di-set lagi
     setState(() {
-      _isLoadingPrediction = true;
-      _errorMessage = null;
+      _loadingStatus = 'Memulai analisis gambar...';
     });
 
     try {
-      final result = await TensorFlowLiteService.predictFood(widget.imagePath);
-      
-      if (result.isNotEmpty && result['food_name'] != null) {
-        setState(() {
-          _topPrediction = result['food_name'];
-          _score = (result['confidence'] ?? 0.0) / 100.0; // Convert percentage to decimal
-        });
+      if (_useIsolate && FoodAnalysisIsolateService.isInitialized) {
+        // Gunakan Isolate untuk background processing
+        await _performAnalysisWithIsolate();
       } else {
-        setState(() {
-          _errorMessage = 'No food recognized in the image';
-        });
+        // Fallback ke method original jika Isolate tidak tersedia
+        await _performAnalysisMainThread();
       }
     } catch (e) {
       setState(() {
@@ -505,6 +569,80 @@ class _PredictionPageState extends State<PredictionPage> {
     } finally {
       setState(() {
         _isLoadingPrediction = false;
+      });
+    }
+  }
+
+  /// Analisis menggunakan Isolate untuk mencegah UI freezing
+  Future<void> _performAnalysisWithIsolate() async {
+    try {
+      // Start loading animation stream
+      final loadingStream = LoadingSimulationService.simulateAnalysisSteps();
+      
+      // Listen to loading steps dan update UI
+      loadingStream.listen((status) {
+        if (mounted) {
+          setState(() {
+            _loadingStatus = status;
+          });
+        }
+      });
+
+      // Jalankan analisis di background Isolate
+      final result = await FoodAnalysisIsolateService.analyzeFood(widget.imagePath);
+      
+      if (result.error != null) {
+        setState(() {
+          _errorMessage = result.error;
+        });
+        return;
+      }
+
+      if (result.foodName != null) {
+        setState(() {
+          _topPrediction = result.foodName;
+          _score = (result.confidence ?? 0.0) / 100.0;
+          
+          // Jika ada data nutrisi, langsung set
+          if (result.nutrition != null) {
+            _mealData = Map<String, dynamic>.from(result.nutrition!);
+            if (result.recipes != null && result.recipes!.isNotEmpty) {
+              _mealData!['recipe'] = result.recipes!.first;
+              _mealData!['recipes'] = result.recipes;
+            }
+          }
+          
+          _loadingStatus = 'Analisis selesai!';
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'Tidak dapat mengenali makanan dari gambar';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Error saat analisis dengan Isolate: $e';
+      });
+    }
+  }
+
+  /// Fallback method tanpa Isolate
+  Future<void> _performAnalysisMainThread() async {
+    setState(() {
+      _loadingStatus = 'Menjalankan prediksi...';
+    });
+
+    final result = await TensorFlowLiteService.predictFood(widget.imagePath);
+    
+    if (result.isNotEmpty && result['food_name'] != null) {
+      setState(() {
+        _topPrediction = result['food_name'];
+        _score = (result['confidence'] ?? 0.0) / 100.0;
+        _loadingStatus = 'Prediksi selesai!';
+      });
+    } else {
+      setState(() {
+        _errorMessage = 'Tidak dapat mengenali makanan dari gambar';
       });
     }
   }
@@ -524,13 +662,29 @@ class _PredictionPageState extends State<PredictionPage> {
     });
 
     try {
-      final mealData = await GeminiNutritionService.getNutritionInfo(_topPrediction!);
-      setState(() {
-        _mealData = mealData as Map<String, dynamic>?;
-      });
+      // Get both nutrition and recipe data
+      final mealData = await LocalNutritionService.getNutritionInfo(_topPrediction!);
+      final recipeData = await LocalNutritionService.getRecipes(_topPrediction!);
+      
+      // Combine nutrition and recipe data
+      if (mealData != null) {
+        final combinedData = Map<String, dynamic>.from(mealData);
+        if (recipeData.isNotEmpty) {
+          combinedData['recipe'] = recipeData.first; // Use the first recipe
+          combinedData['recipes'] = recipeData; // Keep all recipes for potential use
+        }
+        
+        setState(() {
+          _mealData = combinedData;
+        });
+      } else {
+        setState(() {
+          _errorMessage = 'No nutrition data found for this food';
+        });
+      }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to get nutrition info: $e';
+        _errorMessage = 'Failed to get nutrition and recipe info: $e';
       });
     } finally {
       setState(() {
@@ -581,7 +735,7 @@ class _PredictionPageState extends State<PredictionPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        meal['name'] ?? 'Unknown Food',
+                        meal['food_name'] ?? 'Unknown Food',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -602,13 +756,13 @@ class _PredictionPageState extends State<PredictionPage> {
             ),
             const SizedBox(height: 24),
 
-            // Dietary Information Tags
+            // Tag informasi diet
             if (meal['dietaryInfo'] != null) ...[
               _buildDietaryTags(meal['dietaryInfo']),
               const SizedBox(height: 20),
             ],
 
-            // Main Nutrition Facts
+            // Informasi nilai gizi utama
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -647,7 +801,7 @@ class _PredictionPageState extends State<PredictionPage> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // Main macronutrients in a responsive grid
+                  // Grid makronutrien utama yang responsif
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final availableWidth = constraints.maxWidth;
@@ -710,7 +864,7 @@ class _PredictionPageState extends State<PredictionPage> {
                   ),
                   const SizedBox(height: 16),
                   
-                  // Additional nutrition info
+                  // Informasi nutrisi tambahan
                   if (meal['fiber'] != null) _buildNutritionRow('Fiber', '${meal['fiber']}g', Icons.grass, Colors.green),
                   if (meal['sugar'] != null) _buildNutritionRow('Sugar', '${meal['sugar']}g', Icons.cake, Colors.pink),
                   if (meal['sodium'] != null) _buildNutritionRow('Sodium', '${meal['sodium']}mg', Icons.grain, Colors.red.shade300),
@@ -730,7 +884,7 @@ class _PredictionPageState extends State<PredictionPage> {
               _buildBenefitsSection(meal['benefits']),
             ],
 
-            // Recipe Section
+            // Bagian resep masakan
             if (meal['recipe'] != null) ...[
               const SizedBox(height: 20),
               _buildRecipeSection(meal['recipe']),
@@ -1134,7 +1288,7 @@ class _PredictionPageState extends State<PredictionPage> {
           ),
           const SizedBox(height: 16),
 
-          // Recipe info - responsive layout with better spacing
+          // Informasi resep - layout responsif dengan spasi yang lebih baik
           LayoutBuilder(
             builder: (context, constraints) {
               final availableWidth = constraints.maxWidth;

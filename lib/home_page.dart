@@ -329,7 +329,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  // Outer ring
+                                  // Lingkaran luar
                                   Container(
                                     width: 50,
                                     height: 50,
@@ -341,7 +341,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       ),
                                     ),
                                   ),
-                                  // Inner circle
+                                  // Lingkaran dalam
                                   Container(
                                     width: 35,
                                     height: 35,
@@ -357,7 +357,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                       ],
                                     ),
                                   ),
-                                  // Camera icon
+                                  // Ikon kamera
                                   Icon(
                                     Icons.camera_alt,
                                     size: 20,
@@ -562,7 +562,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         children: [
-          // Enhanced Camera preview container - 75% of screen
+          // Kontainer preview kamera - 75% dari layar
           Expanded(
             flex: 7,
             child: Container(
@@ -584,7 +584,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ),
               child: Stack(
                 children: [
-                  // Camera preview with perfect container fit
+                  // Preview kamera dengan fit kontainer yang sempurna
                   ClipRRect(
                     borderRadius: BorderRadius.circular(28),
                     child: Container(
@@ -604,7 +604,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ),
                   ),
                   
-                  // Grid lines overlay - perfectly aligned with camera preview
+                  // Overlay garis grid - sejajar sempurna dengan preview kamera
                   if (!_isLoading && _showGrid)
                     Positioned.fill(
                       child: Container(
@@ -621,7 +621,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                     ),
                   
-                  // Enhanced focus area with animated border
+                  // Area fokus dengan border animasi
                   if (!_isLoading)
                     Positioned.fill(
                       child: Container(
@@ -650,7 +650,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             ),
                             child: Stack(
                               children: [
-                                // Animated corner brackets
+                                // Kurung sudut beranimasi
                                 ...List.generate(4, (index) {
                                   return Positioned(
                                     top: index < 2 ? 15 : null,
@@ -676,7 +676,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   );
                                 }),
                                 
-                                // Center focus dot
+                                // Titik fokus tengah
                                 Center(
                                   child: Container(
                                     width: 8,
@@ -701,9 +701,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                     ),
                   
-                  // Minimal top overlay - removed AI Ready and HD Quality indicators
+                  // Overlay atas minimal - menghapus indikator AI Ready dan HD Quality
                   
-                  // Bottom overlay with tips
+                  // Overlay bawah dengan tips
                   Positioned(
                     bottom: 20,
                     left: 20,
@@ -747,7 +747,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           
           const SizedBox(height: 16),
           
-          // Compact control area - 25% of screen
+          // Area kontrol kompak - 25% dari layar
           Expanded(
             flex: 3,
             child: Container(
@@ -764,9 +764,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Removed AI Status and camera settings indicators
+                    // Menghapus indikator AI Status dan pengaturan kamera
                     const SizedBox(height: 8),
-                    // Control buttons
+                    // Tombol kontrol
                     if (_cameraInitialized) ...[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -803,7 +803,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      // Enhanced Zoom Slider with actual camera control
+                      // Slider zoom dengan kontrol kamera aktual
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
@@ -873,7 +873,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                           try {
                                             await CameraService.setZoomLevel(value);
                                           } catch (e) {
-                                            // Zoom error handled silently
+                                            // Error zoom ditangani secara diam-diam
                                           }
                                         },
                                       ),
@@ -893,7 +893,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       ),
                     ],
                     const SizedBox(height: 8),
-                    // Helpful tip
+                    // Tips membantu
                     Text(
                       'Place food in center frame for best AI recognition',
                       style: TextStyle(
@@ -908,14 +908,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ),
           
-          const SizedBox(height: 100), // Space for floating button
+          const SizedBox(height: 100), // Ruang untuk tombol floating
         ],
       ),
     );
   }
 }
 
-// Custom painter for camera grid lines
+// Painter khusus untuk garis grid kamera
 class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -924,12 +924,12 @@ class GridPainter extends CustomPainter {
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
-    // Add slight padding to ensure grid doesn't touch edges
+    // Tambahkan padding sedikit untuk memastikan grid tidak menyentuh tepi
     final double padding = 0.0;
     final double adjustedWidth = size.width - (padding * 2);
     final double adjustedHeight = size.height - (padding * 2);
 
-    // Draw vertical lines (rule of thirds)
+    // Gambar garis vertikal (aturan sepertiga)
     final double thirdWidth = adjustedWidth / 3;
     canvas.drawLine(
       Offset(padding + thirdWidth, padding),

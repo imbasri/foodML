@@ -36,27 +36,23 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # Image picking and cropping - Compatible with Android & iOS
-  image_picker: ^1.0.8
-  image_cropper: ^8.0.2
+  image_picker: ^1.2.0
+  image_cropper: ^8.1.0
   
   # Camera (Advanced Kriteria 1) - Compatible with Android & iOS
-  camera: ^0.10.5+9
+  camera: ^0.10.6
   
   # Image processing - Compatible with Android & iOS
-  image: ^4.1.7
-  
-  # HTTP requests & API Integration (Advanced Kriteria 3)
-  http: ^1.2.1
-  google_generative_ai: ^0.3.1
-  
-  # Environment variables
-  flutter_dotenv: ^5.1.0
+  image: ^4.2.0
   
   # Path provider for file storage - Compatible with Android & iOS
-  path_provider: ^2.1.2
+  path_provider: ^2.1.5
   
   # Permission handler for camera and storage - Compatible with Android & iOS
-  permission_handler: ^11.3.1
+  permission_handler: ^11.4.0
+  
+  # HTTP client for API requests - Compatible with Android & iOS
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:
@@ -85,7 +81,7 @@ flutter:
     - assets/
     - assets/models/
     - assets/models/food_labels.txt
-    - assets/.env
+    - assets/models/food_classification_model.tflite
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
